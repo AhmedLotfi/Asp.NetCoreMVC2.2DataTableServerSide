@@ -1,0 +1,55 @@
+﻿@model SchoolCoreMvc.Areas.Admin.ViewModels.DepartmentVM
+@inject IDepartmentManager iDepManager
+@{
+    string formType = ViewBag.formType;
+
+    var lstMangers = new SelectList(iDepManager.GetAll().Select(z => new { z.Id, z.Name }),
+                         nameof(DepartmentMangers.Id), nameof(DepartmentMangers.Name));
+}
+
+<form asp-action="@nameof(SchoolCoreMvc.Areas.Admin.Controllers.DepartmentsController.PostDepartment)"
+      asp-controller="Departments" asp-area="@nameof(SchoolCoreMvc.Areas.Admin)"
+      data-ajax="true" data-ajax-method="post"
+      data-ajax-begin="OnBegin" data-ajax-success="OnSuccess" data-ajax-failure="OnFailure" data-ajax-complete="OnComplete">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row">
+        @if (formType == "add")
+        {
+            <div class="col-md-12 text-center form-group">
+                <button type="submit" class="btn btn-outline-primary">Save</button>
+            </div>
+        }
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input type="text" asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="ManagerId"></label>
+                <select asp-for="ManagerId" asp-items="@lstMangers" class="form-control">
+                    <option value="">-- Select Manger --</option>
+                </select>
+                <span asp-validation-for="ManagerId"></span>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label asp-for="Notes"></label>
+                <textarea asp-for="Notes" class="form-control"></textarea>
+            </div>
+        </div>
+
+        @if (formType == "edit")
+        {
+            <div class="col-md-12 text-center form-group">
+                <button type="submit" class="btn btn-outline-primary">Update</button>
+            </div>
+        }
+    </div>
+</form>
+@{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }

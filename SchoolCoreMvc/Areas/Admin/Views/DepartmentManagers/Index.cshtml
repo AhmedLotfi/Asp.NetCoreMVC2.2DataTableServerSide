@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Managers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-striped" id="tblManagers">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+        const _currentTbl = $('#tblManagers');
+
+       $(() => {
+          LoadDataGrid();
+       });
+
+
+        const LoadDataGrid = function () {
+
+             const renderObj ={
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "ajax": {
+                    "url": "/@nameof(SchoolCoreMvc.Areas.Admin)/DepartmentManagers/LoadData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    {
+                        "data": "Id",
+                        "name":"Id",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "Name",
+                        "name":"Name",
+                        "autoWidth": true
+                    }
+                ]
+            };
+
+            _currentTbl.dataTable().fnDestroy();
+
+            _currentTbl.DataTable(renderObj);
+
+        }
+
+    </script>
+
+}

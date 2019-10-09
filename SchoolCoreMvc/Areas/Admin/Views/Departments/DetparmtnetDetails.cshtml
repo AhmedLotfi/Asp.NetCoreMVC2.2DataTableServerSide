@@ -1,0 +1,136 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-striped" id="tblDeps">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Manager</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    const _dtName = $('#tblDeps');
+
+    $(() => {
+        LoadDataGrid();
+    });
+
+    const LoadDataGrid = () => {
+
+
+        $.ajax({
+            url: '/@nameof(SchoolCoreMvc.Areas.Admin)/Departments/@nameof(SchoolCoreMvc.Areas.Admin.Controllers.DepartmentsController.LoadDataGrid)',
+            method: 'GET'
+        }).done((data) => {
+
+            const dtObj = {
+                data: data,
+                retrieve: true,
+                ordering: false,
+                columns: [
+                    { 'data': 'Name' },
+                    { 'data': 'ManagerName' },
+                    {
+                        'data': 'Id',
+                        'render': (id) => {
+                            let btns = '';
+
+                            btns += `<a href="javascript:;" onclick="return ViewDepForm(${id},'details')" title="details"><i class="text-info fa fa-info-circle"></i></a> `;
+                            btns += `<a href="javascript:;" onclick="return ViewDepForm(${id},'edit')" title="edit"><i class="text-success fa fa-edit"></i></a> `;
+                            btns += `<a href="javascript:;" onclick="return DeleteDep(${id})" title="Delete"><i class="text-danger fa fa-trash"></i></a>`;
+
+                            return btns;
+                        }
+                    },
+                ]
+            };
+
+
+            _dtName.DataTable().destroy();
+            _dtName.DataTable(dtObj);
+
+        }).fail((response) => {
+            toastr.error(response.responseText);
+        })
+
+    }
+
+
+    const ViewDepForm = (id,trigger) => {
+
+        const parms = { id,trigger };
+
+            $.ajax({
+                url: '/@nameof(SchoolCoreMvc.Areas.Admin)/Departments/@nameof(SchoolCoreMvc.Areas.Admin.Controllers.DepartmentsController.DepartmentForm)',
+                method: 'GET',
+                data: parms
+            }).done((data) => {
+
+                $('#main-modal .modal-title').addClass(`text-center`);
+                $('#main-modal .modal-title').text(`${trigger} Department`);
+                $('#main-modal .modal-body').html(data);
+
+                if (trigger === 'details') {
+                    $('#main-modal input').attr('disabled',true);
+                    $('#main-modal textarea').attr('disabled',true);
+                    $('#main-modal select').attr('disabled',true);
+                };
+
+                $('#main-modal').modal('show');
+
+            }).fail((response) => {
+                toastr.error(response.responseText);
+            });
+        };
+
+
+    const DeleteDep = (id) => {
+
+        bootbox.confirm({
+            size:"small",
+            message: "Are You Sure ?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) {
+
+                if (result) {
+
+                    $.ajax({
+                        url: '/@nameof(SchoolCoreMvc.Areas.Admin)/Departments/@nameof(SchoolCoreMvc.Areas.Admin.Controllers.DepartmentsController.DeleteDep)',
+                        method: 'POST',
+                        data: { id }
+                    }).done((response) => {
+
+                        if (response.done) {
+                            LoadDataGrid();
+                            toastr.success(response.message);
+                        } else {
+                            toastr.error(response.message);
+                        }
+
+                    }).fail((error) => {
+                        toastr.error(error.responseText);
+                    });
+                };
+            }
+        });
+    };
+
+</script>

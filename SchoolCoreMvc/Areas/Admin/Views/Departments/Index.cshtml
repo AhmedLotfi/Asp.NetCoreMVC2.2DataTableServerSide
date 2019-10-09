@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Departments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <button class="btn btn-outline-info" onclick="return OpenDepModal()">Add Department</button>
+    </div>
+</div>
+<hr />
+<partial name="DetparmtnetDetails.cshtml" />
+
+@section scripts{
+
+    <script>
+
+        const OpenDepModal = () => {
+
+            const parms = { id: '' };
+
+            $.ajax({
+                url: '/@nameof(SchoolCoreMvc.Areas.Admin)/Departments/@nameof(SchoolCoreMvc.Areas.Admin.Controllers.DepartmentsController.DepartmentForm)',
+                method: 'GET',
+                data: parms
+            }).done((data) => {
+
+                $('#main-modal .modal-title').addClass(`text-center`);
+                $('#main-modal .modal-title').text(`Add Department`);
+                $('#main-modal .modal-body').html(data);
+
+                $('#main-modal').modal('show');
+
+            }).fail((response) => {
+                toastr.error(response.responseText);
+            });
+        };
+
+        var OnBegin =function (response) {
+            console.log(response);
+        };
+
+         var OnSuccess =  function(response){
+
+            if ((response.add || response.edit ) && response.done) {
+
+                toastr.success(response.message);
+                LoadDataGrid();
+
+                $('#main-modal').modal('hide');
+
+            } else {
+                toastr.error(response.message);
+            }
+
+        };
+        
+
+        var OnFailure =function(response) {
+              toastr.error(response.message);
+        };
+
+        var OnComplete =function(response) {
+            console.log(response);
+        } 
+
+    </script>
+}
